@@ -36,27 +36,42 @@ def main():
     env.overwriteOutput = True
 
     in_fcs = arcpy.ListFeatureClasses()
+    # in_feat_list = []
+    in_feat_list = [os.path.abspath(os.path.join(in_workspace, in_fc)) for in_fc in in_fcs]
+    
+    env.workspace = clip_workspace
+    clip_fcs = arcpy.ListFeatureClasses()
+    clip_feat_list = [os.path.abspath(os.path.join(clip_workspace, clip_fc)) for clip_fc in clip_fcs]
+    
+    
     for in_fc in in_fcs:
-        in_feat_list = []
         in_feat_list.append(os.path.abspath(os.path.join(in_workspace, in_fc)))
-        print(in_feat_list)
+        # print(in_feat_list)
         # print(in_fc)
 
     # sys.exit()
-    clip_fc = arcpy.ListFeatureClasses()
+    clip_fcs = arcpy.ListFeatureClasses()
+    in_clip_list = []
+    for clip_fc in clip_fcs:
+        in_clip_list.append(os.path.abspath(os.path.join(in_workspace, clip_fc)))
+        
+
     # print (clip_fc)
     
-    for in_feat in in_feat_list:
-        for clip_feat in in_feat_list:
-            out_fc_name = f"{os.path.splitext(clip_feat)[0]}_{os.path.splitext(in_feat)[0]}.shp"
-            out_fc = os.path.abspath(os.path.join(output_workspace, os.path.basename(out_fc_name)))
-            arcpy.Clip_analysis(in_feat, clip_feat, out_fc)
-            print(in_feat)
-            # print("-")
-            print(clip_feat)
-            # print("-")
-            print(out_fc)
-            # print("-")
+    
+    for in_feats in in_feat_list:
+        for clip_feats in clip_feat_list:
+            out_fc_name = f"{os.path.splitext(os.path.basename(clip_feats))[0]}_{os.path.splitext(os.path.basename(in_feats))[0]}.shp"
+            out_fcs = os.path.abspath(os.path.join(output_workspace, out_fc_name))
+            
+            
+            
+            arcpy.Clip_analysis(in_feats, clip_feats, out_fcs)
+            
+            print(in_feats)
+            print(clip_feats)
+            print(out_fcs)
+            print("-")
     
     arcpy.env.overwriteOutput = True         
 
