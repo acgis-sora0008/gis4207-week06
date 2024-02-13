@@ -1,4 +1,6 @@
 import sys
+import os
+import arcpy
 from arcpy import env
 
 
@@ -27,17 +29,13 @@ def main():
 
 
 def batch_clipper(in_features, clip_features, out_feature_class):
-         
-# for each clip_feature:
-        # clip by each in_feature 
-        # arcpy.clip
-        # output = relative path
-        # name = ClipWS_InWS
+    for in_fc in in_features:
+        for clip_fc in clip_features:
+            out_fc_name = "{}_{}.shp".format(os.path.splitext(clip_fc)[0], os.path.splitext(in_fc)[0])
+            out_fc = os.path.join(out_feature_class,out_fc_name)
+            arcpy.Clip_analysis(in_fc, clip_fc, out_fc)
+            arcpy.env.overwriteOutput = True
 
-
-
-        # arcpy.env.overwriteOutput = True
-        print ('not done')
 
     
 if __name__ == "__main__":
