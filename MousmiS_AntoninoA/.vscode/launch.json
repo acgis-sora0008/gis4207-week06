@@ -19,6 +19,15 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args":["..\\..\\..\\..\\data\\BatchClipData\\TargetData", "..\\..\\..\\..\\data\\BatchClipData\\Sites", "..\\..\\..\\..\\data\\BatchClipData\\Output"]
+        },        
+        {
+            "name": "data_prep",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":["..\\..\\..\\..\\data\\surrey", "..\\..\\..\\..\\data\\surrey\\Week6.gdb", "test"]
         }
     ]
 }
