@@ -16,7 +16,7 @@ class Tool:
     def __init__(self):
         """Define the tool (tool name is the name of the class)."""
         self.label = "Tool"
-        self.description = ""
+        self.description = "The toolbox will transfer files from GDbs to FDs in UTMZone10"
 
     def getParameterInfo(self):
         """Define the tool parameters."""
