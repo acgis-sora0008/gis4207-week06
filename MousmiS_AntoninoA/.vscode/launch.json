@@ -28,6 +28,18 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args":["..\\..\\..\\..\\data\\surrey", "..\\..\\..\\..\\data\\surrey\\Week6.gdb", "test"]
+        },
+        {
+            "name": "data_prep_test",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args":["..\\..\\..\\..\\data\\surrey", "..\\..\\..\\..\\data\\surrey\\Week6.gdb", "test"]
+
+
+
         }
     ]
 }
