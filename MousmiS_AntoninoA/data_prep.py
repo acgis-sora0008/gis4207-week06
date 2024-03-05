@@ -43,6 +43,10 @@ def copy_feature_classes(input_folder, output_gdb, output_feature_dataset):
             arcpy.env.workspace = gdb_path
 
             feature_classes = arcpy.ListFeatureClasses()
+            spatial_ref = arcpy.Describe(feature_classes).spatialReference
+            
+            if spatial_ref.name == "Unknown":
+                print("{feature_classes} has an unknown spatial reference".format(fc))
 
             for fc in feature_classes:
                 input_fc = os.path.join(gdb_path, fc)
