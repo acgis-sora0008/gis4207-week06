@@ -1,103 +1,56 @@
-
 import os
 import sys
 
-class Toolbox:
-    def __init__(self):
-        """Define the toolbox (the name of the toolbox is the name of the
-        .pyt file)."""
-        self.label = "Toolbox"
-        self.alias = "toolbox"
+def main():
+    if len(sys.argv) != 4:
+        print("Usage: python script.py <input_folder> <output_gdb> <output_feature_dataset>")
+        sys.exit(1)
 
-        # List of tool classes associated with this toolbox
-        self.tools = [Tool]
+    input_folder = sys.argv[1]
+    output_gdb = sys.argv[2]
+    output_feature_dataset = sys.argv[3]
 
-class Tool:
-    def __init__(self):
-        """Define the tool (tool name is the name of the class)."""
-        self.label = "Tool"
-        self.description = "The toolbox will transfer files from GDbs to FDs in UTMZone10"
+    if not os.path.exists(input_folder):
+        print(f"{input_folder} does not exist.")
+        sys.exit()
 
-    def getParameterInfo(self):
-        """Define the tool parameters."""
-        params = None
-        return params
+    import arcpy
 
-    def isLicensed(self):
-        """Set whether the tool is licensed to execute."""
-        return True
+    copy_feature_classes(input_folder, output_gdb, output_feature_dataset)
 
-    def updateParameters(self, parameters):
-        """Modify the values and properties of parameters before internal
-        validation is performed.  This method is called whenever a parameter
-        has been changed."""
-        return
 
-    def updateMessages(self, parameters):
-        """Modify the messages created by internal validation for each tool
-        parameter. This method is called after internal validation."""
-        return
+def create_gdb(gdb_path):
+    import arcpy
 
-    def execute(self, parameters, messages):
-        """The source code of the tool."""
-        if len(sys.argv) != 4:
-            print('Usage:  data_prep.py <in_gdbs_base_folder> <out_gdb> <out_feature_dataset>')
-            return
+    if not arcpy.Exists(gdb_path):
+        arcpy.management.CreateFileGDB(os.path.dirname(gdb_path), os.path.basename(gdb_path))
+    else:
+        print(f"Geodatabase '{gdb_path}' already exists.")
 
-        in_gdbs_base_folder = sys.argv[1]
-        out_gdb = sys.argv[2]
-        out_feature_dataset = sys.argv[3]
+def copy_feature_classes(input_folder, output_gdb, output_feature_dataset):
+    import arcpy
 
-        if not os.path.exists(in_gdbs_base_folder):
-            print(f"{in_gdbs_base_folder} does not exist.")
-            return
+    create_gdb(output_gdb)
+    arcpy.env.overwriteOutput = True
 
-        # Delayed import for arcpy
-        import arcpy
-        from arcpy import env
+    feature_dataset_path = os.path.join(output_gdb, output_feature_dataset)
+    arcpy.env.workspace = feature_dataset_path
 
-        # Set the workspace using arcpy
-        arcpy.env.workspace = None
-        arcpy.env.workspace = in_gdbs_base_folder
-        arcpy.env.overwriteOutput = True
+    # Walk through input folder and copy feature classes
+    for root, dirs, files in os.walk(input_folder):
+        for dir in dirs:
+            gdb_path = os.path.join(root, dir)
+            arcpy.env.workspace = gdb_path
 
-        out_folder_path = os.path.dirname(out_gdb)
-        out_gdb_name = os.path.basename(out_gdb)
+            feature_classes = arcpy.ListFeatureClasses()
 
-        # List of specific geodatabases
-        geodatabases = [
-            r"..\..\..\..\data\surrey\elementary_school_catchments.gdb",
-            r"..\..\..\..\data\surrey\parks.gdb",
-            r"..\..\..\..\data\surrey\road_centrelines.gdb",
-            r"..\..\..\..\data\surrey\schools.gdb",
-            r"..\..\..\..\data\surrey\surrey_city_boundary.gdb"
-        ]
+            for fc in feature_classes:
+                input_fc = os.path.join(gdb_path, fc)
+                output_fc = os.path.join(feature_dataset_path, fc)
+                arcpy.management.CopyFeatures(input_fc, output_fc)
+                print(f"Copying {fc} from {gdb_path} to {output_gdb}")
 
-        # Loop over the specified geodatabases
-        for gdb in geodatabases:
-            feature_classes = arcpy.ListFeatureClasses("*", "", gdb)
-            
-            if not feature_classes:
-                print(f"No feature classes found in the GDB: {gdb}")
-                continue
-            
-            first_feature_class = feature_classes[0]
-            spatial_reference = arcpy.Describe(os.path.join(gdb, first_feature_class)).spatialReference
-            out_gdb_path = os.path.join(out_gdb, out_feature_dataset)
-            arcpy.management.CreateFileGDB(out_folder_path=os.path.dirname(out_gdb_path), out_name=os.path.basename(out_gdb_path))
-            arcpy.management.CreateFeatureDataset(out_dataset_path=out_gdb_path, out_name=out_feature_dataset, spatial_reference=spatial_reference)
+    print("Feature classes copied successfully.")
 
-            for feature_class in feature_classes:
-                arcpy.conversion.FeatureClassToFeatureClass(in_features=os.path.join(gdb, feature_class),
-                                                            out_path=os.path.join(out_gdb_path, out_feature_dataset),
-                                                            out_name=feature_class)
-            
-            print(f"Data preparation completed in {gdb}")
-
-        print("Data preparation completed successfully!")
-        return
-
-    def postExecute(self, parameters):
-        """This method takes place after outputs are processed and
-        added to the display."""
-        return
+if __name__ == "__main__":
+    main()

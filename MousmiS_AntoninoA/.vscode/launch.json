@@ -27,7 +27,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args":["..\\..\\..\\..\\data\\surrey", "..\\..\\..\\..\\data\\surrey\\Week6.gdb", "test"]
+            "args":["..\\..\\..\\..\\data\\surrey", "..\\..\\..\\..\\data\\testing\\Week7.gdb", "test"]
         },
         {
             "name": "data_prep_test",
